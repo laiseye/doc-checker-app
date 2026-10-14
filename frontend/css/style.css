@@ -1,0 +1,53 @@
+/* Custom styles for Antigravity-inspired Modern Tech Minimalist UI */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Tùy chỉnh thanh cuộn tinh tế */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Hiệu ứng mờ nền cho Modal */
+.modal-backdrop {
+    backdrop-filter: blur(8px);
+    background-color: rgba(15, 23, 42, 0.45);
+}
+
+/* Animation chuyển cảnh nhẹ nhàng */
+.fade-in {
+    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Badge viền tinh tế */
+.badge-border {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}

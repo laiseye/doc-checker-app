@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý & Kiểm tra Hồ sơ điện tử (NCKH)</title>
+    <!-- Tailwind CSS qua CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col">
+
+    <!-- ======================================================================= -->
+    <!-- 1. HEADER (PHONG CÁCH GOOGLE ANTIGRAVITY) -->
+    <!-- ======================================================================= -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-slate-900 tracking-tight text-base sm:text-lg">QUẢN LÝ & KIỂM TRA HỒ SƠ ĐIỆN TỬ</h1>
+                        <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60">Giai đoạn 2</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Đề tài NCKH: Upload tài liệu & Phân tích văn bản (PDF, DOCX)</p>
+                </div>
+            </div>
+
+            <!-- Health Status Badge & Quick Links -->
+            <div class="flex items-center gap-4">
+                <div id="api-health-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs">
+                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span class="text-xs font-medium text-slate-500">Đang kiểm tra API...</span>
+                </div>
+                <a href="/docs" target="_blank" class="text-xs font-medium text-slate-600 hover:text-indigo-600 flex items-center gap-1 bg-slate-100/80 hover:bg-slate-200/60 px-3 py-1.5 rounded-lg transition-colors" title="Mở Swagger API Docs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    <span>Swagger /docs</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================================= -->
+    <!-- 2. NỘI DUNG CHÍNH (MAIN CONTAINER) -->
+    <!-- ======================================================================= -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full flex flex-col gap-6">
+
+        <!-- Navigation Tab Pills -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+            <div class="flex items-center gap-2 p-1 bg-slate-200/60 rounded-2xl w-fit">
+                <button id="tab-btn-regulations" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-indigo-700 bg-white shadow-sm rounded-xl transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <span>Văn bản quy định</span>
+                </button>
+                <button id="tab-btn-dossiers" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-500 hover:text-slate-800 rounded-xl transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                    <span>Bộ hồ sơ thẩm định</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- KHU VỰC 1: VĂN BẢN QUY ĐỊNH (REGULATIONS) -->
+        <!-- =================================================================== -->
+        <section id="section-regulations" class="flex flex-col gap-4 fade-in">
+            <!-- Action & Filter Bar -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3 flex-1">
+                    <!-- Search Input -->
+                    <div class="relative min-w-[240px] flex-1 max-w-md">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </span>
+                        <input type="text" id="reg-search" placeholder="Tìm theo tiêu đề, số hiệu, cơ quan ban hành..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                    </div>
+
+                    <!-- Status Filter -->
+                    <select id="reg-status-filter" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="ACTIVE">Có hiệu lực (ACTIVE)</option>
+                        <option value="EXPIRED">Hết hiệu lực (EXPIRED)</option>
+                        <option value="DRAFT">Dự thảo (DRAFT)</option>
+                    </select>
+
+                    <!-- Toggle Include Deleted -->
+                    <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-600 select-none ml-2">
+                        <input type="checkbox" id="reg-include-deleted" class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                        <span>Xem mục đã xóa</span>
+                    </label>
+                </div>
+
+                <!-- Add Button -->
+                <button id="btn-add-regulation" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Thêm văn bản mới</span>
+                </button>
+            </div>
+
+            <!-- Table Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th class="py-3 px-4">Số hiệu</th>
+                                <th class="py-3 px-4">Tiêu đề văn bản</th>
+                                <th class="py-3 px-4">Phiên bản</th>
+                                <th class="py-3 px-4">Cơ quan ban hành</th>
+                                <th class="py-3 px-4">Hiệu lực</th>
+                                <th class="py-3 px-4">Trạng thái</th>
+                                <th class="py-3 px-4 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regulations-tbody">
+                            <!-- Render bằng JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty State -->
+                <div id="regulations-empty" class="hidden py-14 text-center">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-700">Chưa có văn bản quy định nào</h3>
+                    <p class="text-xs text-slate-500 mt-1">Hãy nhấn nút "Thêm văn bản mới" để tạo bản ghi quy định đầu tiên.</p>
+                </div>
+
+                <!-- Pagination Footer -->
+                <div class="px-4 py-3 bg-slate-50/60 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                    <span id="reg-page-info">Trang 1 / 1</span>
+                    <div class="flex items-center gap-2">
+                        <button id="reg-prev-page" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none transition-colors">Trước</button>
+                        <button id="reg-next-page" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none transition-colors">Sau</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- KHU VỰC 2: BỘ HỒ SƠ (DOSSIERS & CHILD DOCUMENTS) -->
+        <!-- =================================================================== -->
+        <section id="section-dossiers" class="hidden flex flex-col gap-4 fade-in">
+            
+            <!-- 2.1. DANH SÁCH BỘ HỒ SƠ (LIST VIEW) -->
+            <div id="dossiers-list-view" class="flex flex-col gap-4">
+                <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-3 flex-1">
+                        <!-- Search -->
+                        <div class="relative min-w-[240px] flex-1 max-w-md">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </span>
+                            <input type="text" id="dos-search" placeholder="Tìm kiếm bộ hồ sơ theo tên hoặc ghi chú..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+                        </div>
+
+                        <!-- Status Filter -->
+                        <select id="dos-status-filter" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="DRAFT">Bản nháp (DRAFT)</option>
+                            <option value="PENDING">Chờ thẩm định (PENDING)</option>
+                            <option value="APPROVED">Đạt yêu cầu (APPROVED)</option>
+                            <option value="REJECTED">Không đạt (REJECTED)</option>
+                        </select>
+
+                        <!-- Toggle Include Deleted -->
+                        <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-600 select-none ml-2">
+                            <input type="checkbox" id="dos-include-deleted" class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                            <span>Xem hồ sơ đã xóa</span>
+                        </label>
+                    </div>
+
+                    <!-- Add Button -->
+                    <button id="btn-add-dossier" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Tạo bộ hồ sơ mới</span>
+                    </button>
+                </div>
+
+                <!-- Table Dossiers -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Tên bộ hồ sơ thẩm định</th>
+                                    <th class="py-3 px-4">Tài liệu</th>
+                                    <th class="py-3 px-4">Trạng thái</th>
+                                    <th class="py-3 px-4">Ngày tạo</th>
+                                    <th class="py-3 px-4 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dossiers-tbody">
+                                <!-- Render bằng JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="dossiers-empty" class="hidden py-14 text-center">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-700">Chưa có bộ hồ sơ nào</h3>
+                        <p class="text-xs text-slate-500 mt-1">Hãy nhấn "Tạo bộ hồ sơ mới" để bắt đầu thẩm định.</p>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="px-4 py-3 bg-slate-50/60 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                        <span id="dos-page-info">Trang 1 / 1</span>
+                        <div class="flex items-center gap-2">
+                            <button id="dos-prev-page" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none transition-colors">Trước</button>
+                            <button id="dos-next-page" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 disabled:pointer-events-none transition-colors">Sau</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2.2. CHI TIẾT BỘ HỒ SƠ & TÀI LIỆU CON (DETAIL VIEW) -->
+            <div id="dossier-detail-view" class="hidden flex flex-col gap-4">
+                <!-- Back Button & Dossier Banner -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                        <button id="btn-back-to-dossiers" class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            <span>Quay lại danh sách hồ sơ</span>
+                        </button>
+                        <div id="detail-dos-status"></div>
+                    </div>
+
+                    <div>
+                        <h2 id="detail-dos-title" class="text-lg font-bold text-slate-900 tracking-tight"></h2>
+                        <p id="detail-dos-desc" class="text-sm text-slate-600 mt-1"></p>
+                    </div>
+                </div>
+
+                <!-- Upload Box Zone (Giai đoạn 2) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span>Tải lên tài liệu & Tự động bóc tách văn bản</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Chấp nhận: PDF có text (PyMuPDF), DOCX (python-docx), ảnh scan JPG/PNG. Tối đa 20MB.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-semibold text-slate-700 whitespace-nowrap">Loại tài liệu:</label>
+                            <select id="upload-doc-type" class="text-xs px-3 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 font-medium">
+                                <option value="CONTRACT">Hợp đồng cung ứng (CONTRACT)</option>
+                                <option value="LICENSE">Giấy phép (LICENSE)</option>
+                                <option value="APPROVAL">Văn bản chấp thuận (APPROVAL)</option>
+                                <option value="WORKER_LIST">Danh sách lao động (WORKER_LIST)</option>
+                                <option value="OTHER" selected>Tài liệu khác (OTHER)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Drag & Drop Area -->
+                    <div id="drop-zone" class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 hover:bg-indigo-50/20 flex flex-col items-center justify-center gap-2">
+                        <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.jpg,.jpeg,.png">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center pointer-events-none shadow-sm">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                        </div>
+                        <div class="pointer-events-none">
+                            <p class="text-sm font-semibold text-slate-700">Kéo thả tệp tin vào đây, hoặc <span class="text-indigo-600 underline">chọn tệp từ máy tính</span></p>
+                            <p class="text-xs text-slate-400 mt-1">Định dạng hỗ trợ: PDF, DOCX, JPG, PNG (tối đa 20MB)</p>
+                        </div>
+                        <div id="selected-file-info" class="hidden mt-2 p-2 px-4 bg-white rounded-xl border border-indigo-200 text-xs text-indigo-900 flex items-center gap-2 shadow-sm">
+                            <span id="selected-file-name" class="font-medium font-mono text-indigo-700"></span>
+                            <span id="selected-file-size" class="text-slate-500 font-mono"></span>
+                            <button type="button" id="btn-clear-file" class="ml-2 text-rose-500 hover:text-rose-700 font-bold text-base leading-none" title="Bỏ chọn">&times;</button>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress Bar (hidden by default) -->
+                    <div id="upload-progress-container" class="hidden flex flex-col gap-1.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span id="upload-status-text" class="text-indigo-600 font-medium">Đang tải lên và trích xuất nội dung văn bản...</span>
+                            <span id="upload-percentage" class="text-slate-500 font-mono">Đang xử lý</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                            <div id="upload-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300 w-full animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="text-[11px] text-slate-400">
+                            * File tải lên được phân tích ngay và lưu trữ an toàn trong thư mục máy chủ.
+                        </div>
+                        <button type="button" id="btn-upload-file" disabled class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-semibold rounded-xl shadow-sm transition-all flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            <span>Tải lên & Bóc tách văn bản</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-900">Danh sách tài liệu trong hồ sơ</h3>
+                            <p class="text-xs text-slate-500">Xem trước văn bản, số trang và kết quả bóc tách chữ tự động.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-600 select-none">
+                                <input type="checkbox" id="doc-include-deleted" class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                                <span>Xem tài liệu đã xóa</span>
+                            </label>
+                            <button id="btn-add-doc" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg shadow-sm transition-all" title="Khai báo thông tin tài liệu không kèm file">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <span>Thêm metadata</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Documents Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3 px-4">Tên file tài liệu</th>
+                                    <th class="py-3 px-4">Loại tài liệu</th>
+                                    <th class="py-3 px-4">Dung lượng / Trang</th>
+                                    <th class="py-3 px-4">Bóc tách văn bản</th>
+                                    <th class="py-3 px-4">Trạng thái</th>
+                                    <th class="py-3 px-4 text-right">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docs-tbody">
+                                <!-- Render bằng JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Documents Empty State -->
+                    <div id="docs-empty" class="hidden py-10 text-center">
+                        <p class="text-xs text-slate-500">Bộ hồ sơ này chưa có tài liệu nào. Kéo thả file ở trên để tải lên.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ======================================================================= -->
+    <!-- 3. MODALS (FORM POPUPS) -->
+    <!-- ======================================================================= -->
+
+    <!-- Modal 1: Regulation Form -->
+    <div id="modal-regulation" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-xl overflow-hidden fade-in flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+                <h3 id="modal-regulation-title" class="text-base font-bold text-slate-900">Thêm văn bản quy định</h3>
+                <button type="button" id="btn-cancel-regulation" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+            </div>
+            
+            <form id="form-regulation" class="p-6 overflow-y-auto flex flex-col gap-4 text-sm">
+                <input type="hidden" id="reg-id-field">
+                
+                <div id="form-reg-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tiêu đề văn bản <span class="text-rose-500">*</span></label>
+                    <input type="text" id="reg-title" required placeholder="Ví dụ: Luật Người lao động Việt Nam đi làm việc ở nước ngoài" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Số hiệu văn bản <span class="text-rose-500">*</span></label>
+                        <input type="text" id="reg-identifier" required placeholder="Ví dụ: 69/2020/QH14" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Phiên bản <span class="text-rose-500">*</span></label>
+                        <input type="text" id="reg-version" required value="1.0" placeholder="Ví dụ: 2020 hoặc 1.0" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Cơ quan ban hành <span class="text-rose-500">*</span></label>
+                    <input type="text" id="reg-issuing-body" required placeholder="Ví dụ: Quốc hội, Bộ LĐ-TB&XH, Chính phủ" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ngày có hiệu lực (Từ) <span class="text-rose-500">*</span></label>
+                        <input type="date" id="reg-effective-from" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Ngày hết hiệu lực (Đến)</label>
+                        <input type="date" id="reg-effective-to" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <p class="text-[11px] text-slate-400 mt-0.5">Để trống nếu văn bản còn hiệu lực vô thời hạn</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Trạng thái hiệu lực</label>
+                        <select id="reg-status" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="ACTIVE">Có hiệu lực (ACTIVE)</option>
+                            <option value="EXPIRED">Hết hiệu lực (EXPIRED)</option>
+                            <option value="DRAFT">Dự thảo (DRAFT)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Đường dẫn văn bản gốc</label>
+                        <input type="url" id="reg-source-url" placeholder="https://vanban.chinhphu.vn/..." class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('modal-regulation').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Hủy</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-all">Lưu thông tin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Dossier Form -->
+    <div id="modal-dossier" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-lg overflow-hidden fade-in flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+                <h3 id="modal-dossier-title" class="text-base font-bold text-slate-900">Tạo mới bộ hồ sơ</h3>
+                <button type="button" id="btn-cancel-dossier" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+            </div>
+            
+            <form id="form-dossier" class="p-6 flex flex-col gap-4 text-sm">
+                <input type="hidden" id="dos-id-field">
+                <div id="form-dos-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tên bộ hồ sơ thẩm định <span class="text-rose-500">*</span></label>
+                    <input type="text" id="dos-name" required placeholder="Ví dụ: Hồ sơ phái cử thực tập sinh ngành cơ khí Tokyo 2026" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Trạng thái hồ sơ</label>
+                    <select id="dos-status" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="DRAFT">Bản nháp (DRAFT)</option>
+                        <option value="PENDING">Chờ thẩm định (PENDING)</option>
+                        <option value="APPROVED">Đạt yêu cầu (APPROVED)</option>
+                        <option value="REJECTED">Không đạt (REJECTED)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Ghi chú / Mô tả chi tiết</label>
+                    <textarea id="dos-desc" rows="3" placeholder="Ghi chú về doanh nghiệp phái cử, đối tác tiếp nhận, số lượng lao động..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="mt-2 pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('modal-dossier').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Hủy</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-all">Lưu bộ hồ sơ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Document Form -->
+    <div id="modal-document" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-md overflow-hidden fade-in flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+                <h3 id="modal-doc-title" class="text-base font-bold text-slate-900">Khai báo tài liệu (Metadata)</h3>
+                <button type="button" id="btn-cancel-doc" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+            </div>
+            
+            <form id="form-document" class="p-6 flex flex-col gap-4 text-sm">
+                <input type="hidden" id="doc-id-field">
+                <div id="form-doc-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Tên file tài liệu gốc <span class="text-rose-500">*</span></label>
+                    <input type="text" id="doc-name" required placeholder="Ví dụ: hop_dong_cung_ung_lao_dong_so_01.pdf" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Phân loại tài liệu <span class="text-rose-500">*</span></label>
+                    <select id="doc-type" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="CONTRACT">Hợp đồng cung ứng lao động (CONTRACT)</option>
+                        <option value="LICENSE">Giấy phép hoạt động dịch vụ (LICENSE)</option>
+                        <option value="APPROVAL">Văn bản chấp thuận đăng ký hợp đồng (APPROVAL)</option>
+                        <option value="WORKER_LIST">Danh sách lao động xuất cảnh (WORKER_LIST)</option>
+                        <option value="OTHER">Tài liệu khác (OTHER)</option>
+                    </select>
+                </div>
+
+                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800 leading-relaxed">
+                    💡 <strong>Lưu ý Giai đoạn 1:</strong> Hệ thống lưu trữ thông tin siêu dữ liệu (metadata) của tài liệu. Tính năng tải lên file vật lý (PDF, DOCX) và OCR đọc nội dung sẽ được bổ sung ở Giai đoạn 2.
+                </div>
+
+                <div class="mt-2 pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('modal-document').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Hủy</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-all">Lưu tài liệu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 4: Document Viewer (Giai đoạn 2: Xem trước và Trích xuất văn bản) -->
+    <div id="modal-viewer" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/80 w-full max-w-6xl h-[92vh] flex flex-col overflow-hidden fade-in">
+            <!-- Viewer Top Bar -->
+            <div class="px-5 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50/90 gap-4">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-indigo-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h3 id="viewer-doc-name" class="text-sm font-bold text-slate-900 font-mono truncate max-w-md"></h3>
+                            <span id="viewer-status-badge"></span>
+                        </div>
+                        <p id="viewer-doc-meta" class="text-[11px] text-slate-500 truncate mt-0.5"></p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" id="viewer-btn-reparse" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-semibold rounded-xl border border-amber-200/70 shadow-sm transition-all" title="Phân tích lại từ file gốc">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span>Phân tích lại (Reparse)</span>
+                    </button>
+                    <a id="viewer-btn-download" href="#" target="_blank" download class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span>Tải file gốc</span>
+                    </a>
+                    <button type="button" id="viewer-btn-close" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2 py-0.5 rounded-lg hover:bg-slate-100 transition-colors leading-none">&times;</button>
+                </div>
+            </div>
+
+            <!-- 2-Column Split Area -->
+            <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-slate-200 bg-slate-50">
+                <!-- CỘT 1: XEM TRƯỚC FILE GỐC (LEFT COLUMN) -->
+                <div class="h-full flex flex-col bg-slate-100/70 overflow-hidden">
+                    <div class="p-2.5 px-4 bg-white/90 border-b border-slate-200 flex items-center justify-between text-xs font-semibold text-slate-600">
+                        <span class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            <span>XEM TRƯỚC TÀI LIỆU GỐC</span>
+                        </span>
+                        <span id="viewer-preview-type" class="text-[11px] font-mono text-slate-400 uppercase"></span>
+                    </div>
+                    <div id="viewer-preview-body" class="flex-1 overflow-auto flex items-center justify-center p-2 bg-slate-200/40">
+                        <!-- Dynamic: iframe for PDF, img for images, or banner for DOCX -->
+                    </div>
+                </div>
+
+                <!-- CỘT 2: NỘI DUNG VĂN BẢN TRÍCH XUẤT (RIGHT COLUMN) -->
+                <div class="h-full flex flex-col bg-white overflow-hidden">
+                    <div class="p-2.5 px-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/90 gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold text-slate-700">VĂN BẢN ĐÃ TRÍCH XUẤT</span>
+                            <span id="viewer-parser-badge" class="text-[10px] px-2 py-0.5 rounded font-mono bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200/50"></span>
+                        </div>
+                        
+                        <!-- Page Selector Controls -->
+                        <div id="viewer-page-controls" class="flex items-center gap-2">
+                            <label class="text-xs text-slate-500 font-medium">Trang:</label>
+                            <select id="viewer-page-select" class="text-xs px-2.5 py-1 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono">
+                            </select>
+                            <button type="button" id="viewer-btn-copy" class="text-xs px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors" title="Sao chép văn bản trang này">
+                                Sao chép
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Text Viewer Container -->
+                    <div class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+                        <div id="viewer-page-notice" class="hidden p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <span id="viewer-page-notice-text"></span>
+                        </div>
+                        
+                        <pre id="viewer-raw-text" class="flex-1 whitespace-pre-wrap font-mono text-xs bg-slate-900 text-slate-100 p-4 rounded-xl overflow-y-auto select-text leading-relaxed shadow-inner border border-slate-800"></pre>
+                        
+                        <div id="viewer-no-text-notice" class="hidden py-16 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2">
+                            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span id="viewer-no-text-desc">Không có nội dung văn bản nào được trích xuất cho tài liệu này.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- 4. TOAST CONTAINER -->
+    <!-- ======================================================================= -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-auto"></div>
+
+    <!-- Javascript chính -->
+    <script type="module" src="/js/app.js"></script>
+</body>
+</html>
